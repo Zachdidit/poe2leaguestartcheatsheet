@@ -40,31 +40,31 @@
       { type: "mechanic", name: "Gemcutter's Prism", how: "league mechanic", tags: ["currency", "unique"] },
       { type: "secret", name: "Uncut Skill Gem (L11/12) + Uncut Support Gem (Level 4)", how: "Beast Pen — skill gem level scales with Act 4 zone order", tags: ["uncut-support-gem"] },
     ] },
-    { n: 49, name: "Kedge Bay", recLevel: 41, rewards: [
+    { n: 49, name: "Volcanic Warrens", recLevel: 43, rewards: [
+      { type: "mechanic", name: "Uncut Support Gem (Level 4)", how: "league mechanic", tags: ["uncut-support-gem"] },
+      { type: "secret", name: "Possible Rare Ring", how: "Volcanic Nest (two bosses)", tags: ["gear"] },
+    ] },
+    { n: 50, name: "Kedge Bay", recLevel: 41, rewards: [
       { type: "mechanic", name: "Exalted Orb", how: "league mechanic", tags: ["currency"] },
     ] },
-    { n: 50, name: "Whakapanu Island", recLevel: 42, rewards: [
+    { n: 51, name: "Whakapanu Island", recLevel: 42, rewards: [
       { type: "secret", name: "Choice of Uncut Skill / Spirit / Support Gem", how: "Shark Fin (Great White One) → Kaimana", tags: ["uncut-support-gem"] },
       { type: "secret", name: "Uncut Support Gem (Level 4)", how: "Crab Cave", tags: ["uncut-support-gem"] },
       { type: "mechanic", name: "Artificer's Orb", how: "league mechanic", tags: ["currency"] },
     ] },
-    { n: 51, name: "Singing Cavern", recLevel: 42, rewards: [
+    { n: 52, name: "Singing Cavern", recLevel: 42, rewards: [
       { type: "secret", name: "Rare Pearlescent Amulet (implicit % All Ele Res)", how: "Beckoning Clam → return Pearl to Rog in Kingsmarch", tags: ["gear"] },
       { type: "mechanic", name: "Magic Charm", how: "league mechanic", tags: ["flask-charm"] },
     ] },
-    { n: 52, name: "Abandoned Prison", recLevel: 42, rewards: [
+    { n: 53, name: "Abandoned Prison", recLevel: 42, rewards: [
       { type: "permanent", name: "Goddess of Justice (swappable)", how: "+30% Mana Flask Recovery OR +30% Life Flask Recovery", tags: [] },
       { type: "mechanic", name: "Exalted Orb", how: "league mechanic", tags: ["currency"] },
     ] },
-    { n: 53, name: "Solitary Confinement", recLevel: 42, rewards: [
+    { n: 54, name: "Solitary Confinement", recLevel: 42, rewards: [
       { type: "mechanic", name: "Rune", how: "league mechanic", tags: ["socketable"] },
     ] },
-    { n: 54, name: "Shrike Island", recLevel: 43, rewards: [
+    { n: 55, name: "Shrike Island", recLevel: 43, rewards: [
       { type: "mechanic", name: "Uncut Support Gem (Level 4)", how: "league mechanic", tags: ["uncut-support-gem"] },
-    ] },
-    { n: 55, name: "Volcanic Warrens", recLevel: 43, rewards: [
-      { type: "mechanic", name: "Uncut Support Gem (Level 4)", how: "league mechanic", tags: ["uncut-support-gem"] },
-      { type: "secret", name: "Possible Rare Ring", how: "Volcanic Nest (two bosses)", tags: ["gear"] },
     ] },
     { n: 56, name: "Eye of Hinekora", recLevel: 44, rewards: [
       { type: "mechanic", name: "Chaos Orb", how: "league mechanic", tags: ["currency"] },
