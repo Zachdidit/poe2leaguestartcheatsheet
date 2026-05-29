@@ -269,26 +269,31 @@
     }).join('');
 
     return '<div class="legendbar">' +
-      '<button class="filter-chip is-active" data-cat="__all__">All</button>' +
+      '<span class="legendbar-label">Hide</span>' +
       chips + '</div>';
   }
 
   function wireFilter(root) {
     var bar = root.querySelector('.legendbar');
     if (!bar) return;
+    // Inverse "hide bar": each chip is an independent toggle. A category whose
+    // chip is active is HIDDEN (display:none). Nothing hidden by default.
+    function apply() {
+      var hidden = {};
+      bar.querySelectorAll('.filter-chip.is-active').forEach(function (b) {
+        hidden[b.getAttribute('data-cat')] = true;
+      });
+      document.querySelectorAll('.reward-row').forEach(function (r) {
+        var cats = (r.getAttribute('data-cats') || '').split(' ');
+        var hide = cats.some(function (c) { return hidden[c]; });
+        r.classList.toggle('hide', hide);
+      });
+    }
     bar.addEventListener('click', function (ev) {
       var btn = ev.target.closest ? ev.target.closest('.filter-chip') : null;
       if (!btn) return;
-      var cat = btn.getAttribute('data-cat');
-      bar.querySelectorAll('.filter-chip').forEach(function (b) { b.classList.remove('is-active'); });
-      btn.classList.add('is-active');
-      var rows = document.querySelectorAll('.reward-row');
-      rows.forEach(function (r) {
-        if (cat === '__all__') { r.classList.remove('dim'); return; }
-        var cats = (r.getAttribute('data-cats') || '').split(' ');
-        r.classList.toggle('dim', cats.indexOf(cat) === -1);
-      });
-      document.body.setAttribute('data-filter', cat);
+      btn.classList.toggle('is-active');
+      apply();
     });
   }
 

@@ -76,8 +76,8 @@ deck-stage:not(:defined) { visibility: hidden; }
 
 /* reward rows */
 .zone-rewards { }
-.reward-row { display: flex; align-items: flex-start; gap: 10px; padding: 3px 0; line-height: 1.45; transition: opacity 0.12s; }
-.reward-row.dim { opacity: 0.18; }
+.reward-row { display: flex; align-items: flex-start; gap: 10px; padding: 3px 0; line-height: 1.45; }
+.reward-row.hide { display: none; }
 .rr-icon { display: inline-flex; flex-shrink: 0; margin-top: 1px; }
 .rr-body { font-size: 13px; color: #1A1A1F; flex: 1; }
 .rr-chip { display: inline-block; padding: 2px 8px; background: #FAEEDA; color: #633806; border-radius: 4px; font-weight: 500; margin-right: 6px; }
@@ -92,8 +92,9 @@ deck-stage:not(:defined) { visibility: hidden; }
 .legendbar { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 8px 10px; background: rgba(20,20,24,0.92); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); backdrop-filter: blur(6px); }
 .filter-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #D7D7DC; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; line-height: 1.2; font-family: inherit; }
 .filter-chip:hover { background: rgba(255,255,255,0.10); }
-.filter-chip.is-active { background: #fff; color: #1A1A1F; border-color: #fff; }
+/* active chip == this category is HIDDEN: show it struck-through + dimmed */
+.filter-chip.is-active { background: rgba(255,255,255,0.03); color: #6A6A72; border-color: rgba(255,255,255,0.06); text-decoration: line-through; opacity: 0.55; }
 .fc-icon { display: inline-flex; }
-.filter-chip.is-active .fc-icon { color: inherit !important; }
+.legendbar-label { display: inline-flex; align-items: center; padding: 0 6px 0 2px; color: #8A8A92; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 
 @media print { #controls { display: none; } }
