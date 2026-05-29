@@ -28,7 +28,7 @@
   subtitle: "19 zones · three segments · permanent upgrades highlighted",
   accent: "#5C5C66", accentSoft: "#E5E5E8",
   damageFocus: { label: "All resist", color: "#5C5C66", tint: "#E5E5E8" },
-  exp: { startLevel: 48, endLevel: 63, note: "EXP guide ends at Act 4 — campaign ends at L63; later levels are formula-derived" },
+  exp: { startLevel: 48, endLevel: 63 },
   totals: [
     { value: "+8", label: "Weapon Set Skill Points (total)" },
     { value: "+5%", label: "Max life" },

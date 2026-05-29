@@ -10,12 +10,47 @@ body {
   background: #0F0F12;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: #1A1A1F;
+  overflow: hidden; /* #deck owns scrolling */
 }
-deck-stage:not(:defined) { visibility: hidden; }
+
+/* =============================================================================
+ *  Scroll-snap one-pager — each act is a full-viewport panel; the wheel /
+ *  arrows / nav clicks snap between them. Right sidebar (#sidebar) holds the
+ *  act list + the hide legend; #deck fills the rest of the viewport.
+ * ========================================================================== */
+:root { --sidebar-w: 200px; --legend-w: 245px; }
+
+#deck {
+  position: fixed;
+  top: 0; bottom: 0;
+  left: var(--legend-w);
+  right: var(--sidebar-w);
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;            /* hide native scrollbar (Firefox) */
+}
+#deck::-webkit-scrollbar { display: none; }
+
+.slide {
+  height: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slide .poster {
+  transform: scale(var(--deck-scale, 1));
+  transform-origin: center center;
+  flex-shrink: 0;
+  box-shadow: 0 14px 60px rgba(0,0,0,0.55);
+}
 
 /* ---- poster (one act / slide) ---- */
 .poster {
-  width: 1920px; height: 1080px;
+  width: var(--poster-w, 1920px); height: var(--poster-h, 1080px);
   background: #FAF9F5;
   display: flex; flex-direction: column;
 }
@@ -37,6 +72,12 @@ deck-stage:not(:defined) { visibility: hidden; }
 .total-value { font-size: 30px; font-weight: 500; color: #1A1A1F; letter-spacing: -0.015em; line-height: 1.05; }
 .total-label { font-size: 11px; color: #6B6B73; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 8px; font-weight: 500; }
 
+/* badge key — explains the zone symbols (sits between title and exp banner) */
+.badge-key { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding: 8px 60px 10px; background: #fff; border-top: 1px solid #ECECEC; }
+.bk-label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8A8A92; }
+.bk-item { display: inline-flex; align-items: center; gap: 8px; }
+.bk-text { font-size: 13px; color: #4B4B53; line-height: 1.2; }
+
 /* exp banner */
 .exp-banner { display: flex; align-items: center; gap: 14px; padding: 5px 60px; background: #FFFAF0; border-top: 1px solid #F0E6D0; border-bottom: 1px solid #F0E6D0; color: #4B4B53; font-size: 12px; line-height: 1.3; }
 .exp-head { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
@@ -53,7 +94,8 @@ deck-stage:not(:defined) { visibility: hidden; }
 
 /* zone grid */
 .poster-grid { flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 40px; padding: 16px 60px 24px; overflow: hidden; }
-.col { display: flex; flex-direction: column; }
+/* spread zones to fill the (now taller) column so the steps use the height */
+.col { display: flex; flex-direction: column; justify-content: space-between; gap: 4px; }
 
 /* segment divider (interludes) */
 .segment { margin: 10px 0 4px; padding-bottom: 3px; border-bottom: 2px solid var(--accent, #5C5C66); display: flex; align-items: baseline; justify-content: space-between; }
@@ -87,14 +129,81 @@ deck-stage:not(:defined) { visibility: hidden; }
 /* footer */
 .poster-footer { padding: 14px 60px; background: #1A1A1F; color: #9A9AA0; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
 
-/* ---- controls (filter bar) — fixed, outside the scaled deck ---- */
-#controls { position: fixed; left: 50%; transform: translateX(-50%); bottom: 14px; z-index: 10001; max-width: 96vw; }
-.legendbar { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 8px 10px; background: rgba(20,20,24,0.92); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); backdrop-filter: blur(6px); }
-.filter-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #D7D7DC; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; line-height: 1.2; font-family: inherit; }
+/* ---- side rails: legend on the left, act list on the right ---- */
+#sidebar, #legend-rail {
+  position: fixed; top: 0; bottom: 0;
+  background: #141414;
+  display: flex; flex-direction: column; overflow-y: auto;
+  z-index: 10001; color: #D7D7DC;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent;
+}
+#sidebar { right: 0; width: var(--sidebar-w); border-left: 1px solid rgba(255,255,255,0.08); }
+#legend-rail { left: 0; width: var(--legend-w); border-right: 1px solid rgba(255,255,255,0.08); }
+
+/* act list (right) */
+.deck-nav { display: flex; flex-direction: column; gap: 2px; padding: 16px 10px 10px; }
+.deck-nav-head { padding: 0 8px 8px; color: #8A8A92; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.nav-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border: 0; background: transparent; color: #9A9AA0; border-radius: 8px; cursor: pointer; text-align: left; font-family: inherit; line-height: 1.25; transition: background 140ms ease, color 140ms ease; }
+.nav-item:hover { background: rgba(255,255,255,0.06); color: #D7D7DC; }
+.nav-item.is-current { background: rgba(255,255,255,0.10); color: #fff; }
+.nav-n { flex-shrink: 0; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; background: rgba(255,255,255,0.08); color: #C9C9CE; font-size: 11px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.nav-item.is-current .nav-n { background: #D97757; color: #fff; }
+.nav-label { font-size: 12px; font-weight: 500; }
+
+/* hide legend (left — reuses .filter-chip wiring from render.js) */
+.legendbar { display: flex; flex-direction: column; align-items: stretch; gap: 4px; padding: 16px 12px; }
+.filter-chip { display: inline-flex; align-items: center; gap: 8px; width: 100%; padding: 8px 11px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #D7D7DC; border-radius: 7px; font-size: 15px; font-weight: 500; cursor: pointer; line-height: 1.2; font-family: inherit; text-align: left; }
 .filter-chip:hover { background: rgba(255,255,255,0.10); }
 /* active chip == this category is HIDDEN: show it struck-through + dimmed */
 .filter-chip.is-active { background: rgba(255,255,255,0.03); color: #6A6A72; border-color: rgba(255,255,255,0.06); text-decoration: line-through; opacity: 0.55; }
-.fc-icon { display: inline-flex; }
-.legendbar-label { display: inline-flex; align-items: center; padding: 0 6px 0 2px; color: #8A8A92; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.fc-icon { display: inline-flex; flex-shrink: 0; }
+.legendbar-label { display: block; padding: 0 2px 6px; color: #8A8A92; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 
-@media print { #controls { display: none; } }
+/* =============================================================================
+ *  Responsive — the poster auto-scales (JS fit() reads #deck's box), so the
+ *  rails just need to give it room. Narrow the rails on tablets, then drop
+ *  them to a top (acts) + bottom (legend) bar on phones.
+ * ========================================================================== */
+@media (max-width: 1100px) {
+  :root { --sidebar-w: 190px; --legend-w: 190px; }
+}
+
+@media (max-width: 760px) {
+  /* fixed-height horizontal bars so #deck's top/bottom insets are known */
+  :root { --act-bar-h: 50px; --legend-bar-h: 56px; }
+
+  #deck { top: var(--act-bar-h); bottom: var(--legend-bar-h); left: 0; right: 0; }
+
+  /* act list → top bar */
+  #sidebar {
+    top: 0; left: 0; right: 0; bottom: auto; width: auto; height: var(--act-bar-h);
+    flex-direction: row; overflow-x: auto; overflow-y: hidden;
+    border-left: 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .deck-nav { flex-direction: row; gap: 4px; padding: 7px 10px; }
+  .deck-nav-head { display: none; }
+  .nav-item { width: auto; flex-shrink: 0; padding: 6px 10px; gap: 7px; white-space: nowrap; }
+
+  /* legend → bottom bar */
+  #legend-rail {
+    top: auto; bottom: 0; left: 0; right: 0; width: auto; height: var(--legend-bar-h);
+    flex-direction: row; overflow-x: auto; overflow-y: hidden;
+    border-right: 0; border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .legendbar { flex-direction: row; align-items: center; gap: 6px; padding: 0 12px; }
+  .legendbar-label { padding: 0 6px 0 0; flex-shrink: 0; }
+  .filter-chip { width: auto; flex-shrink: 0; white-space: nowrap; }
+
+  /* pack steps to the top on phones rather than spreading them out */
+  .col { justify-content: flex-start; }
+}
+
+/* ---- print: one act per page, no chrome ---- */
+@media print {
+  body { overflow: visible; }
+  #sidebar, #legend-rail { display: none; }
+  #deck { position: static; inset: auto; overflow: visible; }
+  .slide { display: block; height: auto; break-after: page; page-break-after: always; }
+  .slide:last-child { break-after: auto; page-break-after: auto; }
+  .slide .poster { transform: none; box-shadow: none; }
+}

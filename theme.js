@@ -65,7 +65,8 @@ window.POE_THEME = {
                  tip: 'High-EXP zone — worth farming' },
     mustVisit: { bg: '#C05A0F', fg: '#fff', icon: 'star',
                  tip: 'Must-visit · permanent upgrade or notable drop' },
-    abyss:     { bg: '#1A1A1F', fg: '#fff', icon: 'abyss', label: 'Abyss spawn' },
+    abyss:     { bg: '#1A1A1F', fg: '#fff', icon: 'abyss', label: 'Abyss spawn',
+                 tip: 'Abyss can spawn here' },
   },
 
   // --- Shared UI neutrals (per-act accents live on each act in the data). ---

@@ -201,6 +201,28 @@
       (seg.zoneRange ? '<span class="segment-range">' + esc(seg.zoneRange) + '</span>' : '') + '</div>';
   }
 
+  // Key for the zone badges (Farm / must-visit / abyss) — reuses the exact
+  // badge markup from zone() so it matches what's shown in the grid.
+  function badgeKey() {
+    var b = T.badges;
+    function item(badge, text) {
+      return '<span class="bk-item">' + badge +
+        '<span class="bk-text">' + esc(text) + '</span></span>';
+    }
+    var farm = '<span class="z-badge z-pill" style="background:' + b.farm.bg + ';color:' + b.farm.fg + '">' +
+      '<span class="z-pill-i">' + icon(b.farm.icon) + '</span>' + esc(b.farm.label) + '</span>';
+    var must = '<span class="z-badge z-square" style="background:' + b.mustVisit.bg + ';color:' + b.mustVisit.fg + '">' +
+      icon(b.mustVisit.icon) + '</span>';
+    var abyss = '<span class="z-badge z-square" style="background:' + b.abyss.bg + ';color:' + b.abyss.fg + '">' +
+      icon(b.abyss.icon) + '</span>';
+    return '<div class="badge-key">' +
+      '<span class="bk-label">Symbols</span>' +
+      item(farm, b.farm.tip) +
+      item(must, b.mustVisit.tip) +
+      item(abyss, b.abyss.tip) +
+    '</div>';
+  }
+
   // sequential weighted 3-column split (ported), segment-aware
   function splitSequential(items, n) {
     var weights = items.map(function (z) {
@@ -235,7 +257,7 @@
     }).join('');
 
     return '<div class="poster" style="--accent:' + act.accent + '">' +
-      header(act) + expBanner(act) +
+      header(act) + badgeKey() + expBanner(act) +
       '<div class="poster-grid">' + colHtml + '</div>' +
       footer(act, idx, total) +
     '</div>';
@@ -297,28 +319,134 @@
     });
   }
 
+  // ---- act list (right sidebar nav) -------------------------------------
+  function navList() {
+    var items = ACTS.map(function (act, i) {
+      return '<button class="nav-item" type="button" data-goto="' + i + '">' +
+        '<span class="nav-n">' + (i + 1) + '</span>' +
+        '<span class="nav-label">' + esc(act.title) + '</span></button>';
+    }).join('');
+    return '<nav class="deck-nav"><div class="deck-nav-head">Acts</div>' + items + '</nav>';
+  }
+
+  // ---- scroll-snap navigation -------------------------------------------
+  // Each act is a full-viewport panel. The wheel / arrows / nav clicks step
+  // one panel at a time with a smooth snap (the popular one-page-site feel);
+  // CSS scroll-snap keeps touch + scrollbar drags aligned too.
+  // Poster *design* width. Smaller than the viewport ⇒ the whole poster scales
+  // up to fill the width, so every step renders bigger. Lower to enlarge more.
+  var DESIGN_W = 1440;
+  // Tallest natural content across the acts (measured at DESIGN_W) — the poster
+  // must stay at least this tall or the densest act would clip. Small buffer.
+  var MIN_CONTENT_H = 1010;
+
+  function initScroll(deck, slides, navItems) {
+    var current = 0, locked = false, lockTimer = null;
+
+    function fit() {
+      // Fill the deck area edge-to-edge — no letterboxing. Scale to the
+      // available WIDTH (against DESIGN_W, so content is large), then set the
+      // poster's *design* height to availH/scale so its scaled box is exactly
+      // the deck box: zero black on any normal screen. The step grid is flex:1,
+      // so surplus height becomes white space inside the card, not black bars.
+      var availW = deck.clientWidth, availH = deck.clientHeight;
+      var scale = availW / DESIGN_W;
+      var posterH = availH / scale;
+      // Only when the area is so wide/short that filling would clip the content
+      // (posterH < what the densest act needs) do we fit-to-height instead,
+      // which letterboxes the sides — content integrity wins there.
+      if (posterH < MIN_CONTENT_H) {
+        posterH = MIN_CONTENT_H;
+        scale = availH / posterH;
+      }
+      deck.style.setProperty('--deck-scale', scale);
+      deck.style.setProperty('--poster-w', DESIGN_W + 'px');
+      deck.style.setProperty('--poster-h', posterH + 'px');
+    }
+
+    function setActive(i) {
+      navItems.forEach(function (b, j) { b.classList.toggle('is-current', j === i); });
+    }
+
+    function go(i) {
+      i = Math.max(0, Math.min(slides.length - 1, i));
+      if (i === current) return;
+      current = i;
+      locked = true;
+      slides[i].scrollIntoView({ behavior: 'smooth' });
+      setActive(i);
+      clearTimeout(lockTimer);
+      lockTimer = setTimeout(function () { locked = false; }, 700);
+    }
+
+    // Discrete one-panel-per-gesture wheel handling (fullPage-style).
+    deck.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      if (locked || Math.abs(e.deltaY) < 4) return;
+      go(current + (e.deltaY > 0 ? 1 : -1));
+    }, { passive: false });
+
+    // Keyboard nav — ignore while typing in a field.
+    window.addEventListener('keydown', function (e) {
+      var t = e.target;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      var k = e.key, handled = true;
+      if (k === 'ArrowDown' || k === 'PageDown' || k === ' ' || k === 'Spacebar') go(current + 1);
+      else if (k === 'ArrowUp' || k === 'PageUp') go(current - 1);
+      else if (k === 'Home') go(0);
+      else if (k === 'End') go(slides.length - 1);
+      else handled = false;
+      if (handled) e.preventDefault();
+    });
+
+    // Nav clicks.
+    navItems.forEach(function (b, i) {
+      b.addEventListener('click', function () { go(i); });
+    });
+
+    // Keep `current` + highlight in sync with any scroll source (touch,
+    // scrollbar drag, programmatic) — not just the wheel path above.
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting && en.intersectionRatio >= 0.5) {
+            current = slides.indexOf(en.target);
+            setActive(current);
+          }
+        });
+      }, { root: deck, threshold: [0.5, 0.75] });
+      slides.forEach(function (s) { io.observe(s); });
+    }
+
+    window.addEventListener('resize', fit);
+    fit();
+    setActive(0);
+  }
+
   // ---- mount ------------------------------------------------------------
   function mount() {
     var root = document.getElementById('root');
     if (!root) return;
 
-    var deck = document.createElement('deck-stage');
-    deck.setAttribute('width', '1920');
-    deck.setAttribute('height', '1080');
-
-    ACTS.forEach(function (act, i) {
-      var sec = document.createElement('section');
-      sec.setAttribute('data-label', act.title);
-      sec.innerHTML = actSection(act, i, ACTS.length);
-      deck.appendChild(sec);
+    var deck = el('div', { id: 'deck' });
+    var slides = ACTS.map(function (act, i) {
+      var slide = el('div', { class: 'slide', 'data-label': act.title });
+      slide.innerHTML = actSection(act, i, ACTS.length);
+      deck.appendChild(slide);
+      return slide;
     });
-
     root.appendChild(deck);
 
-    // filter bar lives outside the scaled deck so it's always usable
-    var bar = el('div', { id: 'controls' }, legendAndFilter());
-    document.body.appendChild(bar);
+    // Act list (right rail) + hide legend (left rail).
+    var sidebar = el('aside', { id: 'sidebar' }, navList());
+    document.body.appendChild(sidebar);
+    var legendRail = el('aside', { id: 'legend-rail' }, legendAndFilter());
+    document.body.appendChild(legendRail);
+
     wireFilter(document);
+    var navItems = Array.prototype.slice.call(sidebar.querySelectorAll('.nav-item'));
+    initScroll(deck, slides, navItems);
   }
 
   if (document.readyState === 'loading') {

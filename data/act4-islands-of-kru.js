@@ -83,7 +83,7 @@
       { type: "mechanic", name: "Rare Amulet", how: "league mechanic", tags: ["gear"] },
     ] },
     { n: 60, name: "Ngakanu", recLevel: 47, rewards: [
-      { type: "mechanic", name: "Greater Jeweller's Orb", how: "reported Abyss drop in this area (unconfirmed)", tags: ["currency", "unique"], abyss: true },
+      { type: "mechanic", name: "Greater Jeweller's Orb", how: "league mechanic", tags: ["currency", "unique"] },
     ] },
     { n: 61, name: "Heart of the Tribe", recLevel: 47, rewards: [
       { type: "mechanic", name: "Uncut Spirit Gem (Level 12)", how: "league mechanic", tags: ["uncut-spirit-gem"] },
