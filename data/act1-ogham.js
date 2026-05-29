@@ -28,7 +28,7 @@
   subtitle: "14 zones · chronological · permanent upgrades highlighted",
   accent: "#3D5A80", accentSoft: "#E3E8F0",
   damageFocus: { label: "Cold", color: "#3D5A80", tint: "#E3E8F0" },
-  exp: { startLevel: 1, endLevel: 13, note: "or 14 for L5 skill gems" },
+  exp: { startLevel: 1, endLevel: 13 },
   totals: [
     { value: "+4", label: "Passive points" },
     { value: "+10%", label: "Cold resistance" },

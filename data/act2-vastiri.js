@@ -28,7 +28,7 @@
   subtitle: "17 zones · chronological · permanent upgrades highlighted",
   accent: "#B07A2C", accentSoft: "#F2E7D2",
   damageFocus: { label: "Lightning", color: "#9A7016", tint: "#F5ECCC" },
-  exp: { startLevel: 13, endLevel: 28.5, note: "guard your level in the second half" },
+  exp: { startLevel: 13, endLevel: 28.5 },
   totals: [
     { value: "+4", label: "Passive points" },
     { value: "+10%", label: "Lightning resistance" },

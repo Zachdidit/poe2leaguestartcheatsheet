@@ -89,7 +89,7 @@
       { type: "mechanic", name: "Uncut Spirit Gem (Level 12)", how: "league mechanic", tags: ["uncut-spirit-gem"] },
     ] },
     { n: 62, name: "Journey's End", rewards: [
-      { type: "permanent", name: "+2 Weapon Set Skill Points", how: "Dark Mists quest — defeat Omniphobia, Fear Manifest (NEW IN 0.4)", tags: [] },
+      { type: "permanent", name: "+2 Weapon Set Skill Points", how: "Dark Mists quest — defeat Omniphobia, Fear Manifest", tags: [] },
       { type: "mechanic", name: "Orb of Alchemy", how: "league mechanic", tags: ["currency"] },
     ] },
   ],
