@@ -336,12 +336,31 @@
   // Poster *design* width. Smaller than the viewport ⇒ the whole poster scales
   // up to fill the width, so every step renders bigger. Lower to enlarge more.
   var DESIGN_W = 1440;
-  // Tallest natural content across the acts (measured at DESIGN_W) — the poster
-  // must stay at least this tall or the densest act would clip. Small buffer.
-  var MIN_CONTENT_H = 1010;
 
   function initScroll(deck, slides, navItems) {
     var current = 0, locked = false, lockTimer = null;
+
+    // The poster can fill the deck box only down to the height its densest act
+    // actually needs — any shorter and steps would clip. Measure that real
+    // height once (at DESIGN_W) instead of guessing, so the fill is as wide as
+    // possible before any letterboxing is needed.
+    deck.style.setProperty('--poster-w', DESIGN_W + 'px');
+    function measureMinContentH() {
+      var max = 0;
+      slides.forEach(function (s) {
+        var p = s.querySelector('.poster'); if (!p) return;
+        var cols = [].slice.call(p.querySelectorAll('.col'));
+        var prevH = p.style.height;
+        var prevJ = cols.map(function (c) { return c.style.justifyContent; });
+        cols.forEach(function (c) { c.style.justifyContent = 'flex-start'; });
+        p.style.height = 'auto';
+        if (p.scrollHeight > max) max = p.scrollHeight;
+        p.style.height = prevH;
+        cols.forEach(function (c, i) { c.style.justifyContent = prevJ[i]; });
+      });
+      return max;
+    }
+    var minContentH = measureMinContentH() + 8; // small buffer against rounding
 
     function fit() {
       // Fill the deck area edge-to-edge — no letterboxing. Scale to the
@@ -355,12 +374,11 @@
       // Only when the area is so wide/short that filling would clip the content
       // (posterH < what the densest act needs) do we fit-to-height instead,
       // which letterboxes the sides — content integrity wins there.
-      if (posterH < MIN_CONTENT_H) {
-        posterH = MIN_CONTENT_H;
+      if (posterH < minContentH) {
+        posterH = minContentH;
         scale = availH / posterH;
       }
       deck.style.setProperty('--deck-scale', scale);
-      deck.style.setProperty('--poster-w', DESIGN_W + 'px');
       deck.style.setProperty('--poster-h', posterH + 'px');
     }
 
